@@ -88,4 +88,4 @@ export default function WatchSeriePage() {
       <div className="watch-status">{status}</div>
     </div>
   )
-}
+                                                }
