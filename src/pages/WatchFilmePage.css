@@ -1,0 +1,7 @@
+.watch-iframe {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: none;
+  background: #000;
+  display: block;
+}

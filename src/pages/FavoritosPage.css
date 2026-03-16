@@ -1,0 +1,22 @@
+.favs-page { padding: 16px; }
+.favs-title { font-family: var(--font-cond); font-size: 1.6rem; font-weight: 900; margin-bottom: 20px; }
+.favs-empty { text-align: center; padding: 60px 16px; color: var(--muted); }
+.favs-empty-icon { font-size: 3rem; margin-bottom: 16px; }
+.favs-empty p { font-size: .9rem; margin-bottom: 6px; }
+.favs-btn {
+  margin-top: 20px; padding: 12px 28px;
+  background: var(--yellow); color: var(--black);
+  font-family: var(--font-cond); font-size: 1rem; font-weight: 900;
+  border-radius: 10px;
+}
+.favs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.fav-item { position: relative; cursor: pointer; }
+.fav-img { width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: 10px; background: var(--card2); display: block; }
+.fav-remove {
+  position: absolute; top: 6px; right: 6px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(0,0,0,.7); border: 1px solid rgba(255,255,255,.2);
+  color: #fff; font-size: .65rem; display: flex; align-items: center; justify-content: center;
+}
+.fav-title { font-size: .72rem; font-weight: 700; margin-top: 6px; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.fav-type { font-size: .62rem; color: var(--yellow); font-weight: 700; margin-top: 2px; text-transform: uppercase; }

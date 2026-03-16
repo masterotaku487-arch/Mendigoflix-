@@ -1,0 +1,14 @@
+.manga-read-page { padding: 16px; min-height: 100vh; }
+.manga-read-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.manga-read-title { font-family: var(--font-cond); font-size: 1.3rem; font-weight: 900; flex: 1; }
+.chapters-list { display: flex; flex-direction: column; gap: 8px; }
+.chapter-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; background: var(--card);
+  border: 1px solid var(--border); border-radius: 10px;
+  cursor: pointer; transition: border-color .15s; color: var(--text);
+}
+.chapter-item:hover { border-color: var(--yellow); }
+.chapter-num { font-family: var(--font-cond); font-size: 1rem; font-weight: 900; color: var(--yellow); min-width: 60px; }
+.chapter-title { flex: 1; font-size: .85rem; font-weight: 600; }
+.chapter-arrow { color: var(--muted); }

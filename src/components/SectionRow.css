@@ -1,0 +1,10 @@
+.section-row { padding: 20px 0 8px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; margin-bottom: 14px; }
+.section-title {
+  font-family: var(--font-cond); font-size: 1.15rem; font-weight: 900; letter-spacing: .5px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title::before { content: ''; display: block; width: 4px; height: 18px; background: var(--yellow); border-radius: 2px; }
+.section-more { font-size: .78rem; font-weight: 700; color: var(--yellow); cursor: pointer; }
+.cards-row { display: flex; gap: 10px; padding: 0 16px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+.cards-row::-webkit-scrollbar { display: none; }

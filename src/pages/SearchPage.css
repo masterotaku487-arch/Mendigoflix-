@@ -1,0 +1,38 @@
+.search-page { padding: 16px; }
+.search-bar { position: relative; margin-bottom: 16px; }
+.search-input {
+  width: 100%; padding: 13px 16px; padding-right: 40px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; color: var(--text); font-size: .95rem;
+  outline: none; transition: border-color .15s;
+}
+.search-input:focus { border-color: var(--yellow); }
+.search-clear {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); font-size: .9rem;
+}
+.search-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; scrollbar-width: none; }
+.search-tab {
+  flex-shrink: 0; padding: 6px 14px; border-radius: 100px;
+  border: 1px solid var(--border); background: var(--card);
+  font-size: .8rem; font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+.search-tab.active { background: var(--yellow); border-color: var(--yellow); color: var(--black); }
+.search-loading { text-align: center; padding: 32px; color: var(--muted); }
+.search-results { display: flex; flex-direction: column; gap: 10px; }
+.search-item {
+  display: flex; gap: 12px; padding: 10px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; cursor: pointer; transition: border-color .15s;
+}
+.search-item:active { border-color: var(--yellow); }
+.search-thumb { width: 54px; height: 76px; border-radius: 8px; object-fit: cover; background: var(--card2); flex-shrink: 0; }
+.search-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+.search-title { font-size: .9rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.search-meta { display: flex; gap: 8px; font-size: .72rem; color: var(--muted); }
+.search-badge {
+  background: rgba(255,214,0,.15); border: 1px solid rgba(255,214,0,.3);
+  color: var(--yellow); padding: 1px 7px; border-radius: 4px;
+  font-size: .65rem; font-weight: 900; text-transform: uppercase;
+}
+.search-empty { text-align: center; padding: 40px 16px; color: var(--muted); }

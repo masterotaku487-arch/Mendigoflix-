@@ -1,0 +1,12 @@
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+
+.main {
+  padding-top: 60px;
+  padding-bottom: calc(var(--nav-h) + 8px);
+  flex: 1;
+}
+
+.main-watch {
+  flex: 1;
+  padding: 0;
+}
