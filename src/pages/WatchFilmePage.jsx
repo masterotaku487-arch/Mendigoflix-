@@ -1,44 +1,37 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { getFilmeById } from '../services/tmdb'
 import { saveHistory } from '../services/history'
 import './WatchPage.css'
 import './WatchFilmePage.css'
 
-const FILMES_PROXY = 'https://filmes-proxy.masterotaku487.workers.dev'
+const PROXY = 'https://stream-proxy.masterotaku487.workers.dev'
 
 export default function WatchFilmePage() {
   const { id } = useParams()
+  const [sp, setSp] = useSearchParams()
   const nav = useNavigate()
+  const dubbed = sp.get('dub') === '1'
   const [filme, setFilme] = useState(null)
   const [embedUrl, setEmbedUrl] = useState(null)
   const [status, setStatus] = useState('Carregando...')
 
   useEffect(() => {
-    getFilmeById(id).then(async d => {
+    getFilmeById(id).then(d => {
       setFilme(d)
       saveHistory({ id: Number(id), title: d.title, image: `https://image.tmdb.org/t/p/w500${d.poster_path}`, type: 'filme' })
-      await loadEmbed(d)
     })
   }, [id])
 
-  async function loadEmbed(d) {
+  useEffect(() => { if (filme) loadEmbed() }, [filme, dubbed])
+
+  async function loadEmbed() {
     setStatus('🔄 Buscando filme...')
-    // 1. Donflix via TMDB ID — direto, sem scraping
-    try {
-      const r = await fetch(`${FILMES_PROXY}?action=donflix&tmdb_id=${id}&type=movie`)
-      const data = await r.json()
-      if (data.embed) { setEmbedUrl(data.embed); setStatus('✅ ' + (data.source||'Donflix')); return }
-    } catch {}
-    // 2. Busca por título nas outras fontes
-    try {
-      const r2 = await fetch(`${FILMES_PROXY}?action=auto&q=${encodeURIComponent(d.title)}`)
-      const data2 = await r2.json()
-      if (data2.embed) { setEmbedUrl(data2.embed); setStatus('✅ ' + (data2.source||'Stream')); return }
-    } catch {}
-    // 3. Fallback final
-    setEmbedUrl(`https://donflix2.pages.dev/watch/movie?tmdb_id=${id}`)
-    setStatus('✅ Donflix')
+    setEmbedUrl(null)
+    // Donflix com clean=1 (sem anúncios)
+    const url = `${PROXY}?action=donflix&tmdb_id=${id}&type=movie&clean=1`
+    setEmbedUrl(url)
+    setStatus(`✅ ${filme.title}${dubbed?' · Dublado':' · Legendado'}`)
   }
 
   return (
@@ -46,10 +39,16 @@ export default function WatchFilmePage() {
       <div className="watch-controls-top">
         <button className="watch-back" onClick={() => nav(-1)}>‹</button>
         <div className="watch-title">{filme?.title}</div>
+        <button className="watch-dub-toggle" onClick={() => setSp({ dub: dubbed ? '0' : '1' })}>
+          {dubbed ? '🎙️ Dub' : '🇧🇷 Leg'}
+        </button>
       </div>
+
       {embedUrl ? (
         <iframe className="watch-iframe" src={embedUrl}
-          allowFullScreen allow="autoplay; fullscreen" referrerPolicy="origin" />
+          allowFullScreen allow="autoplay; fullscreen"
+          sandbox="allow-scripts allow-same-origin allow-presentation"
+        />
       ) : (
         <div className="watch-container">
           <div className="watch-placeholder">
@@ -58,6 +57,7 @@ export default function WatchFilmePage() {
           </div>
         </div>
       )}
+
       <div className="watch-status">{status}</div>
     </div>
   )
