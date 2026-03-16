@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { getSerieById } from '../services/tmdb'
+import { getImdbId, getPlayerUrls } from '../services/players'
 import { saveHistory } from '../services/history'
 import './WatchPage.css'
 import './WatchFilmePage.css'
 
-const PROXY = 'https://stream-proxy.masterotaku487.workers.dev'
+const PLAYERS = ['VidSrc','MultiEmbed','Embed.su','AutoEmbed','2Embed']
 
 export default function WatchSeriePage() {
   const { id } = useParams()
@@ -13,50 +14,56 @@ export default function WatchSeriePage() {
   const nav = useNavigate()
   const season  = parseInt(sp.get('t') || '1')
   const episode = parseInt(sp.get('e') || '1')
-  const dubbed  = sp.get('dub') === '1'
   const [serie, setSerie] = useState(null)
-  const [embedUrl, setEmbedUrl] = useState(null)
+  const [playerIdx, setPlayerIdx] = useState(0)
+  const [imdbId, setImdbId] = useState(null)
   const [status, setStatus] = useState('Carregando...')
 
   useEffect(() => {
-    getSerieById(id).then(d => {
+    getSerieById(id).then(async d => {
       setSerie(d)
-      saveHistory({ id: Number(id), title: d.name, image: `https://image.tmdb.org/t/p/w500${d.poster_path}`, type: 'serie' })
+      saveHistory({ id: Number(id), title: d.name, image:`https://image.tmdb.org/t/p/w500${d.poster_path}`, type:'serie' })
+      const imdb = await getImdbId(id, 'tv')
+      setImdbId(imdb)
+      setStatus(`✅ T${season} EP${episode}`)
     })
   }, [id])
 
-  useEffect(() => {
-    if (serie) loadEmbed()
-  }, [serie, season, episode, dubbed])
+  useEffect(() => { if (imdbId) setStatus(`✅ T${season} EP${episode} · ${PLAYERS[playerIdx]}`) }, [season, episode, playerIdx, imdbId])
 
-  async function loadEmbed() {
-    setStatus('🔄 Buscando episódio...')
-    setEmbedUrl(null)
-
-    // 1. Donflix via TMDB ID + parâmetro &clean=1 (sem anúncios)
-    const donUrl = `${PROXY}?action=donflix&tmdb_id=${id}&type=serie&s=${season}&e=${episode}&clean=1`
-    setEmbedUrl(donUrl)
-    setStatus(`✅ T${season} EP${episode}${dubbed?' · Dublado':' · Legendado'}`)
-  }
-
-  const goEp = (s, e) => setSp({ t: s, e, ...(dubbed ? { dub: '1' } : {}) })
+  const urls = imdbId ? getPlayerUrls(imdbId, 'tv', season, episode) : []
+  const currentUrl = urls[playerIdx] || null
   const totalEps = serie?.seasons?.find(s => s.season_number === season)?.episode_count || 0
+
+  const goEp = (s, e) => { setSp({ t: s, e }); setPlayerIdx(0) }
 
   return (
     <div className="watch-page">
       <div className="watch-controls-top">
         <button className="watch-back" onClick={() => nav(-1)}>‹</button>
         <div className="watch-title">{serie?.name} — T{season} EP{episode}</div>
-        <button className="watch-dub-toggle" onClick={() => setSp({ t: season, e: episode, dub: dubbed ? '0' : '1' })}>
-          {dubbed ? '🎙️' : '🇧🇷'}
-        </button>
       </div>
 
-      {embedUrl ? (
-        <iframe className="watch-iframe" src={embedUrl}
-          allowFullScreen allow="autoplay; fullscreen"
-          sandbox="allow-scripts allow-same-origin allow-presentation"
-        />
+      {currentUrl ? (
+        <>
+          <iframe
+            key={currentUrl}
+            className="watch-iframe"
+            src={currentUrl}
+            allowFullScreen
+            allow="autoplay; fullscreen; encrypted-media"
+            referrerPolicy="origin"
+          />
+          <div className="player-switcher">
+            {PLAYERS.slice(0, urls.length).map((p, i) => (
+              <button key={i}
+                className={`player-btn ${playerIdx === i ? 'active' : ''}`}
+                onClick={() => setPlayerIdx(i)}>
+                {p}
+              </button>
+            ))}
+          </div>
+        </>
       ) : (
         <div className="watch-container">
           <div className="watch-placeholder">
@@ -66,13 +73,13 @@ export default function WatchSeriePage() {
         </div>
       )}
 
-      {/* Navegação */}
+      {/* Navegação de episódios */}
       <div className="watch-nav">
         <button className="watch-ep-btn" disabled={episode <= 1}
-          onClick={() => episode > 1 ? goEp(season, episode-1) : null}>
+          onClick={() => episode > 1 && goEp(season, episode-1)}>
           ‹ EP {episode-1}
         </button>
-        <span className="watch-ep-cur">EP {episode}/{totalEps||'?'}</span>
+        <span className="watch-ep-cur">EP {episode}{totalEps ? `/${totalEps}` : ''}</span>
         <button className="watch-ep-btn" onClick={() => goEp(season, episode+1)}>
           EP {episode+1} ›
         </button>
