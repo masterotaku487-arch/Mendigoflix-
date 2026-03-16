@@ -48,3 +48,29 @@
 .watch-ep-btn:active { border-color: var(--yellow); color: var(--yellow); }
 .watch-ep-cur { font-family: var(--font-cond); font-size: 1rem; font-weight: 900; color: var(--yellow); }
 .watch-status { padding: 8px 16px; font-size: .75rem; color: var(--muted); }
+
+.watch-dub-toggle {
+  margin-left: auto; padding: 6px 12px;
+  background: rgba(255,214,0,.15);
+  border: 1px solid rgba(255,214,0,.4);
+  border-radius: 8px; color: var(--yellow);
+  font-size: .78rem; font-weight: 700;
+}
+
+/* Player switcher */
+.player-switcher {
+  display: flex; gap: 6px; padding: 10px 16px;
+  overflow-x: auto; scrollbar-width: none;
+  background: var(--black); border-top: 1px solid var(--border);
+}
+.player-switcher::-webkit-scrollbar { display: none; }
+.player-btn {
+  flex-shrink: 0; padding: 6px 14px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--card);
+  font-size: .78rem; font-weight: 700; color: var(--muted);
+  transition: all .15s; white-space: nowrap;
+}
+.player-btn.active {
+  background: var(--yellow); border-color: var(--yellow);
+  color: var(--black);
+  }
