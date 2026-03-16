@@ -5,13 +5,7 @@ import { saveHistory } from '../services/history'
 import './WatchPage.css'
 import './WatchFilmePage.css'
 
-const POBREFLIX = 'https://pobreflix-proxy.masterotaku487.workers.dev'
-
-const slugify = (s, year) =>
-  'assistir-' + s.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-')
-    + '-dublado-' + year
+const FILMES_PROXY = 'https://filmes-proxy.masterotaku487.workers.dev'
 
 export default function WatchFilmePage() {
   const { id } = useParams()
@@ -30,27 +24,21 @@ export default function WatchFilmePage() {
 
   async function loadEmbed(d) {
     setStatus('🔄 Buscando filme...')
+    // 1. Donflix via TMDB ID — direto, sem scraping
     try {
-      const year = d.release_date?.slice(0, 4) || ''
-      const slug = slugify(d.title, year)
-      // Tenta buscar via Worker proxy
-      const r = await fetch(`${POBREFLIX}?action=search&q=${encodeURIComponent(d.title)}&year=${year}`)
+      const r = await fetch(`${FILMES_PROXY}?action=donflix&tmdb_id=${id}&type=movie`)
       const data = await r.json()
-      if (data.url) {
-        setEmbedUrl(data.url)
-        setStatus('✅ Pobreflix')
-      } else {
-        // Fallback: monta URL direto
-        setEmbedUrl(`https://www.pobreflixtv.forum/${slug}/?area=online`)
-        setStatus('✅ Carregando player...')
-      }
-    } catch {
-      // Fallback direto
-      const year = d.release_date?.slice(0, 4) || ''
-      const slug = slugify(d.title, year)
-      setEmbedUrl(`https://www.pobreflixtv.forum/${slug}/?area=online`)
-      setStatus('✅ Player externo')
-    }
+      if (data.embed) { setEmbedUrl(data.embed); setStatus('✅ ' + (data.source||'Donflix')); return }
+    } catch {}
+    // 2. Busca por título nas outras fontes
+    try {
+      const r2 = await fetch(`${FILMES_PROXY}?action=auto&q=${encodeURIComponent(d.title)}`)
+      const data2 = await r2.json()
+      if (data2.embed) { setEmbedUrl(data2.embed); setStatus('✅ ' + (data2.source||'Stream')); return }
+    } catch {}
+    // 3. Fallback final
+    setEmbedUrl(`https://donflix2.pages.dev/watch/movie?tmdb_id=${id}`)
+    setStatus('✅ Donflix')
   }
 
   return (
@@ -59,15 +47,9 @@ export default function WatchFilmePage() {
         <button className="watch-back" onClick={() => nav(-1)}>‹</button>
         <div className="watch-title">{filme?.title}</div>
       </div>
-
       {embedUrl ? (
-        <iframe
-          className="watch-iframe"
-          src={embedUrl}
-          allowFullScreen
-          allow="autoplay; fullscreen"
-          referrerPolicy="origin"
-        />
+        <iframe className="watch-iframe" src={embedUrl}
+          allowFullScreen allow="autoplay; fullscreen" referrerPolicy="origin" />
       ) : (
         <div className="watch-container">
           <div className="watch-placeholder">
@@ -76,7 +58,6 @@ export default function WatchFilmePage() {
           </div>
         </div>
       )}
-
       <div className="watch-status">{status}</div>
     </div>
   )
