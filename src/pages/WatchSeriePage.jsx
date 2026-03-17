@@ -53,6 +53,7 @@ export default function WatchSeriePage() {
             allowFullScreen
             allow="autoplay; fullscreen; encrypted-media"
             referrerPolicy="origin"
+            sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
           />
           <div className="player-switcher">
             {PLAYERS.slice(0, urls.length).map((p, i) => (
@@ -88,4 +89,4 @@ export default function WatchSeriePage() {
       <div className="watch-status">{status}</div>
     </div>
   )
-                                                }
+}
