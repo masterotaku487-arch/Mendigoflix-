@@ -54,3 +54,7 @@
 .hist-type { font-size: .7rem; color: var(--yellow); font-weight: 700; text-transform: uppercase; margin-top: 2px; }
 
 .perfil-version { text-align: center; font-size: .72rem; color: var(--border); padding-top: 24px; }
+
+.perfil-links { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+.perfil-link-btn { width:100%; padding:12px; background:var(--card); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:.85rem; font-weight:700; text-align:left; }
+  
