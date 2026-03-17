@@ -53,6 +53,7 @@ export default function WatchFilmePage() {
             allowFullScreen
             allow="autoplay; fullscreen; encrypted-media"
             referrerPolicy="origin"
+            sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
             onLoad={() => setLoaded(true)}
           />
           {/* Troca de player */}
@@ -78,4 +79,4 @@ export default function WatchFilmePage() {
       <div className="watch-status">{status}</div>
     </div>
   )
-}
+          }
