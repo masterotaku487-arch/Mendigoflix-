@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getHistory } from '../services/history'
 import './PerfilPage.css'
 
@@ -8,6 +9,7 @@ const savePrefs = (p) => localStorage.setItem(PREFS_KEY, JSON.stringify(p))
 
 export default function PerfilPage() {
   const [prefs, setPrefs] = useState(loadPrefs)
+  const nav = useNavigate()
   const hist = getHistory()
 
   const set = (key, val) => {
@@ -88,6 +90,11 @@ export default function PerfilPage() {
         ))}
       </div>
 
+      <div className="perfil-links">
+        <button className="perfil-link-btn" onClick={() => nav('/termos')}>📋 Termos de Uso</button>
+        <button className="perfil-link-btn" onClick={() => nav('/privacidade')}>🔒 Privacidade</button>
+        <button className="perfil-link-btn" onClick={() => { localStorage.clear(); window.location.reload() }}>🗑️ Limpar dados</button>
+      </div>
       <div className="perfil-version">MendigoFlix v1.0.0</div>
     </div>
   )
