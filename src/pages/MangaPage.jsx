@@ -3,71 +3,101 @@ import { useNavigate } from 'react-router-dom'
 import './MangaPage.css'
 
 const CDN = 'https://uploads.mangadex.org'
+const API = 'https://api.mangadex.org'
 
 async function getMangas() {
-  // Usa proxy CORS do MangaDex
   try {
-    const r = await fetch('https://api.mangadex.org/manga?limit=24&order[followedCount]=desc&contentRating[]=safe&includes[]=cover_art&availableTranslatedLanguage[]=pt-br')
-    const d = await r.json()
-    if (d.data?.length) return d.data
-  } catch {}
-  try {
-    // Fallback sem filtro de idioma
-    const r = await fetch('https://api.mangadex.org/manga?limit=24&order[followedCount]=desc&contentRating[]=safe&includes[]=cover_art')
+    const r = await fetch(
+      `${API}/manga?limit=24&order[followedCount]=desc&contentRating[]=safe&contentRating[]=suggestive&includes[]=cover_art`
+    )
     const d = await r.json()
     return d.data || []
   } catch { return [] }
 }
 
-function getCover(m) {
-  const c = m.relationships?.find(r=>r.type==='cover_art')
-  if (!c?.attributes?.fileName) return ''
-  return `${CDN}/covers/${m.id}/${c.attributes.fileName}.256.jpg`
+function getCover(manga) {
+  const coverRel = manga.relationships?.find(r => r.type === 'cover_art')
+  if (!coverRel?.attributes?.fileName) return null
+  return `${CDN}/covers/${manga.id}/${coverRel.attributes.fileName}.512.jpg`
 }
 
-function getTitle(m) {
-  const t = m.attributes?.title
-  return t?.['pt-br'] || t?.['pt'] || t?.en || Object.values(t||{})[0] || '?'
+function getTitle(manga) {
+  const t = manga.attributes?.title
+  if (!t) return 'Sem título'
+  return t['pt-br'] || t['pt'] || t['en'] || t['ja-ro'] || Object.values(t)[0] || 'Sem título'
+}
+
+function getTags(manga) {
+  return manga.attributes?.tags
+    ?.filter(t => t.attributes?.group === 'genre')
+    ?.slice(0, 2)
+    ?.map(t => t.attributes?.name?.en || '')
+    ?.filter(Boolean)
+    ?.join(' • ') || ''
 }
 
 export default function MangaPage() {
   const nav = useNavigate()
   const [mangas, setMangas] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
-  useEffect(() => { getMangas().then(d=>{ setMangas(d); setLoading(false) }) }, [])
+  const load = () => {
+    setLoading(true)
+    setError(false)
+    getMangas().then(d => {
+      if (d.length === 0) setError(true)
+      setMangas(d)
+      setLoading(false)
+    })
+  }
+
+  useEffect(() => { load() }, [])
 
   return (
     <div className="manga-page">
       <div className="manga-header">
         <h1 className="manga-title">📖 Mangás</h1>
-        <p className="manga-sub">Mais seguidos no MangaDex</p>
+        <p className="manga-sub">Mais populares no MangaDex</p>
       </div>
+
       {loading ? (
         <div className="manga-loading">
-          {[...Array(9)].map((_,i)=><div key={i} className="skeleton" style={{width:'30%',aspectRatio:'2/3',borderRadius:10}}/>)}
+          {[...Array(9)].map((_,i) => (
+            <div key={i} className="skeleton manga-skeleton" />
+          ))}
         </div>
-      ) : mangas.length===0 ? (
+      ) : error ? (
         <div className="manga-empty">
-          <p>😔 Não foi possível carregar os mangás.</p>
-          <p style={{fontSize:'.8rem',marginTop:8,color:'var(--muted)'}}>Verifique sua conexão e tente novamente.</p>
-          <button className="manga-retry" onClick={()=>{ setLoading(true); getMangas().then(d=>{setMangas(d);setLoading(false)}) }}>Tentar novamente</button>
+          <div style={{fontSize:'3rem'}}>😔</div>
+          <p>Não foi possível carregar os mangás.</p>
+          <button className="manga-retry-btn" onClick={load}>Tentar novamente</button>
         </div>
       ) : (
         <div className="manga-grid">
-          {mangas.map(m=>(
-            <div key={m.id} className="manga-item" onClick={()=>nav(`/manga/${m.id}`)}>
-              {getCover(m) ? (
-                <img src={getCover(m)} alt={getTitle(m)} className="manga-img"
-                  onError={e=>{e.target.style.display='none';e.target.nextSibling.style.display='flex'}}/>
-              ) : null}
-              <div className="manga-img-placeholder" style={{display: getCover(m)?'none':'flex'}}>📖</div>
-              <div className="manga-item-title">{getTitle(m)}</div>
-              <div className="manga-item-meta">{m.attributes?.status}</div>
-            </div>
-          ))}
+          {mangas.map(m => {
+            const cover = getCover(m)
+            const title = getTitle(m)
+            return (
+              <div key={m.id} className="manga-item" onClick={() => nav(`/manga/${m.id}`)}>
+                <div className="manga-img-wrap">
+                  {cover
+                    ? <img src={cover} alt={title} className="manga-img"
+                        onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex' }} />
+                    : null
+                  }
+                  <div className="manga-img-fallback" style={{display: cover ? 'none' : 'flex'}}>📖</div>
+                </div>
+                <div className="manga-item-info">
+                  <div className="manga-item-title">{title}</div>
+                  <div className="manga-item-tags">{getTags(m)}</div>
+                </div>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>
   )
-}
+      }
+                
