@@ -1,13 +1,19 @@
-.manga-page { padding: 16px; }
+.manga-page { padding: 16px; padding-bottom: 80px; }
 .manga-header { margin-bottom: 20px; }
 .manga-title { font-family: var(--font-cond); font-size: 1.8rem; font-weight: 900; }
 .manga-sub { font-size: .82rem; color: var(--muted); margin-top: 4px; }
-.manga-loading { display: flex; flex-wrap: wrap; gap: 10px; }
-.manga-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+.manga-loading { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.manga-skeleton { aspect-ratio: 2/3; border-radius: 10px; }
+
+.manga-empty { text-align: center; padding: 60px 16px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.manga-retry-btn { padding: 12px 28px; background: var(--yellow); color: var(--black); border-radius: 10px; font-weight: 900; font-family: var(--font-cond); font-size: 1rem; }
+
+.manga-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
 .manga-item { cursor: pointer; }
-.manga-img { width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: 10px; background: var(--card2); }
-.manga-item-title { font-size: .72rem; font-weight: 700; margin-top: 6px; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.manga-item-meta { font-size: .62rem; color: var(--muted); margin-top: 2px; text-transform: capitalize; }
-.manga-empty { text-align:center; padding:40px 16px; color:var(--muted); }
-.manga-retry { margin-top:16px; padding:10px 24px; background:var(--yellow); color:var(--black); border-radius:10px; font-weight:700; }
-.manga-img-placeholder { width:100%; aspect-ratio:2/3; background:var(--card2); border-radius:10px; font-size:2rem; align-items:center; justify-content:center; }
+.manga-img-wrap { position: relative; aspect-ratio: 2/3; border-radius: 10px; overflow: hidden; background: var(--card2); }
+.manga-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.manga-img-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--card2); }
+.manga-item-info { padding: 6px 2px; }
+.manga-item-title { font-size: .72rem; font-weight: 700; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.manga-item-tags { font-size: .62rem; color: var(--muted); margin-top: 2px; }
