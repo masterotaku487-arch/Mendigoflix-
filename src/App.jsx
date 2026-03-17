@@ -15,6 +15,8 @@ import MangaPage from './pages/MangaPage'
 import MangaReadPage from './pages/MangaReadPage'
 import FavoritosPage from './pages/FavoritosPage'
 import PerfilPage from './pages/PerfilPage'
+import TermosPage from './pages/TermosPage'
+import PrivacidadePage from './pages/PrivacidadePage'
 import './App.css'
 
 export default function App() {
@@ -39,6 +41,8 @@ export default function App() {
           <Route path="/manga/:id"       element={<MangaReadPage />} />
           <Route path="/favoritos"       element={<FavoritosPage />} />
           <Route path="/perfil"          element={<PerfilPage />} />
+          <Route path="/termos"          element={<TermosPage />} />
+          <Route path="/privacidade"     element={<PrivacidadePage />} />
         </Routes>
       </main>
       {!isWatch && <BottomNav />}
