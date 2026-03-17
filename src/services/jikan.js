@@ -1,27 +1,32 @@
+// Jikan API para animes
 const JIKAN = 'https://api.jikan.moe/v4'
 const cache = new Map()
 
 async function get(path) {
   if (cache.has(path)) return cache.get(path)
-  const r = await fetch(`${JIKAN}${path}`)
-  const d = await r.json()
-  cache.set(path, d)
-  return d
+  try {
+    const r = await fetch(`${JIKAN}${path}`)
+    if (!r.ok) throw new Error(`${r.status}`)
+    const d = await r.json()
+    cache.set(path, d)
+    return d
+  } catch(e) {
+    console.warn('[Jikan]', path, e.message)
+    return { data: [] }
+  }
 }
 
 export const imgHD = (a) => a?.images?.webp?.large_image_url || a?.images?.jpg?.large_image_url || ''
-export const imgSM = (a) => a?.images?.webp?.small_image_url || a?.images?.jpg?.image_url || ''
 
 export function formatAnime(a) {
   return {
-    id: a.mal_id,
+    id: a.mal_id, type: 'anime',
     title: a.title_english || a.title,
     image: imgHD(a),
     rating: a.score?.toFixed(1),
     episodes: a.episodes ? `${a.episodes} EPS` : 'ATIVO',
     genre: a.genres?.[0]?.name,
     year: a.aired?.from?.slice(0, 4),
-    type: a.type,
     synopsis: a.synopsis,
     status: a.status,
     badge: a.status === 'Currently Airing' ? 'NOVO' : null,
@@ -44,8 +49,7 @@ export async function getAnimeById(id) {
 }
 
 export async function getAnimeEpisodes(id, page = 1) {
-  const d = await get(`/anime/${id}/episodes?page=${page}`)
-  return d
+  return get(`/anime/${id}/episodes?page=${page}`)
 }
 
 export async function searchAnimes(query, limit = 20) {
